@@ -12,32 +12,27 @@ const fieldCharacter = "░";
 const pathCharacter = "*";
 
 class Field {
-	constructor(field = [[]]) {
-		this.field = field;
+	constructor(height,width, holePercen = 0.2){
+		this.height = height;
+    this.width = width;
+    this.field = Field.generateField(height, width, holePercen);
+    this.positionRow = 0;
+    this.positionCol = 0;
+    this.playing = true;
 
-		// Replace with your own code //
-		// Set the home position at (0, 0) before the game starts
-		this.positionRow = 0;
-		this.positionCol = 0;
-		this.field[this.positionRow][this.positionCol] = pathCharacter;
+    this.field[this.positionRow][this.positionCol] = pathCharacter;
 	}
+	static generateField(height, width, holePercen) {
+    const field = new Array(height)
+      .fill(null)
+      .map(() => new Array(width).fill(fieldCharacter));
 
-	// Print field //
-	print() {
-		clear();
+    const totalTiles = height * width;
+    const numHoles = Math.floor(totalTiles * holePercen);
+    let holesPlaced = 0;
 
-		// Replace with your own code //
-		console.log(this.field); // Please REMOVE this line before you start your code!
-	}
+    
 
-	// Your Code //
 }
 
-// Game Mode ON
-// Remark: Code example below should be deleted and use your own code.
-const newGame = new Field([
-	["░", "░", "O"],
-	["░", "O", "░"],
-	["░", "^", "░"],
-]);
-newGame.print();
+

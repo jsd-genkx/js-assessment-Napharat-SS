@@ -131,13 +131,110 @@
 
 ### Thinking Process
 
-1. // step 1
-2. // step 2
-3. // ...
-4. // step n
+1. ใช้ promptSync รับ input จากผู้เล่นใน terminal
+```
+import promptSync from "prompt-sync"
+import clear from "clear-screen"
+```
+- ทำให้ prompt ทำงานได้
+```
+const prompt = promptSync({ sigint: true})
+```
+2. มากำหนดให้ว่าเราจะให้ hat, hole, field, character เป็นสัญลักษณ์แบบไหนเพื่อให้ง่ายต่อการเล่นหรือจะใส่อิโมจิก็ได้
+```
+const hat = "^";
+const hole = "O";
+const fieldCharacter = "░";
+const pathCharacter = "*";
+```
+3.สร้าง field ของตัวเกม 
+```
+class Field {
+  constructor()
+}
+```
+> ใน class นี้จะกำหนดรูปแบบต่างใน field ของเรา 
+- ไม่ให้ hat และ player อยู่ตำแหน่งเดียวกัน
+```
+setPos(offLimit = { x: 0, y: 0 }) {
+  let pos = { x: 0, y: 0 };
+  do {
+    pos.x = Math.floor(Math.random() * this.field[0].length);
+    pos.y = Math.floor(Math.random() * this.field.length);
+  } while (pos.x === offLimit.x && pos.y === offLimit.y);  // ถ้าซ้ำกับ offLimit ให้สุ่มใหม่
 
-_Notes:_<br>
-_- You can attach flowcharts, diagrams, and images as needed._<br>
-_- The purpose of this section is not to explain your code but rather to convey your thoughts and ideas._
+  return pos;
+}
+```
+- ตั้งตำแหน่งเริ่มให้ผู้เล่น ในที่นี่ตั้งใน `setStart()` 
+- ตั้งตำแหน่งหมวกด้วย แล้วต้องตั้งไม่ให้ซ้ำกับผู้เล่น ใช้ `setHat()`
+- กำหนดการเคลื่องไหวต่าๆ 
+```
+moveUp()    { this.moveTo(this.locationX, this.locationY - 1); }
+moveDown()  { this.moveTo(this.locationX, this.locationY + 1); }
+moveLeft()  { this.moveTo(this.locationX - 1, this.locationY); }
+moveRight() { this.moveTo(this.locationX + 1, this.locationY); }
+```
+>moveUp(), moveDown(), moveLeft(), moveRight()
+>เราจะอิิงจากแกน X และ Y
+
+- กำหนด `updatePos()` เพื่อตรวจดูว่าผู้เล่นจะแพ้, ชนะ, ตกขอบ
+
+4.รับ input ผู้เล่น
+```
+getInput(){
+    const input = prompt("เดิน (u = ขึ้น, d = ลง, l = ซ้าย, r = ขวา): ").toLowerCase();
+    switch (input){
+      case "u":
+        this.moveUp();
+        break;
+      case "d":
+        this.moveDown();
+        break;
+      case "l":
+        this.moveLeft();
+        break;
+      case "r":
+        this.moveRight();
+        break;
+      default:
+        console.log("ป้อนเฉพาะ u d l r เท่านั้น!");
+        this.getInput();
+        break;
+    }
+  }
+```
+5. สร้าง `runGame()` แล้วเรียกทุกอย่างมา
+```
+runGame() {
+    this.setStart();
+    this.setHat();
+
+    while (true) {
+      this.print();
+      this.getInput(); 
+    }
+  }
+```
+- สร้างพื้นที่แบบrandom และใช้ `fill()` และ `map()` เพื่อจะได้สร้างArray
+>แต่ละช่องจะมีโอกาสเป็นhole กำหนดให้เป็น 0.2 = 20%
+```
+static generateField(height, weight, percen = 0.2) {
+    return new Array(height).fill(null).map(() =>
+      new Array(weight).fill(null).map(() =>
+        Math.random() > percen ? fieldCharacter : hole
+      )
+    );
+  }
+```
+6.เริ่มเกม สร้างสนามอันนี้เราสร้าง 10 * 10 มีหลุดrandomพื้นที่ 20%
+```
+const myField = new Field(Field.generateField(10, 10, 0.2));
+myField.runGame();
+```
+>จากนั้นลูปตลอดเวลา → แสดง field → รอ input → ทำงานวนไปเรื่อย ๆ จนจบเกม
+
+
+
 
 [🔝 Back to Table of Contents](#table-of-contents)
